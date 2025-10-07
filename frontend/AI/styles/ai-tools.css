@@ -1,0 +1,96 @@
+/* AI工具（内联）样式最小集 */
+
+/* Small AI badge for tabs */
+.ai-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 6px;
+    font-size: 10px;
+    line-height: 1;
+    color: #fff;
+    background: #28a745;
+    border-radius: 8px;
+}
+
+
+/* 工具选项面板 */
+.ai-tool-options {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ai-tool-options h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+/* Inline AI controls inside Image properties */
+.ai-inline-hint {
+    margin-top: 6px;
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.ai-inline-controls {
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px dashed #e0e0e0;
+    border-radius: 8px;
+    background: #fafbff;
+}
+
+.ai-inline-controls .ai-inline-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.ai-inline-controls .ai-inline-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ai-inline-controls .ai-inline-btn {
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.ai-inline-btn.ai-bg { background: #17a2b8; }
+.ai-inline-btn.ai-exp { background: #ffc107; color: #212529; }
+.ai-inline-btn.ai-anime { background: #e83e8c; }
+.ai-inline-btn.ai-outline { background: #6f42c1; }
+
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .ai-tools-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-comparison {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .image-selection-buttons {
+        flex-direction: column;
+    }
+
+    .result-actions {
+        flex-direction: column;
+    }
+
+    .result-actions .btn {
+        width: 100%;
+    }
+}
+
+
+
+/* 仅保留 AI+ 徽标与内联控件样式 */

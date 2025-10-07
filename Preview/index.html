@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PVC Card Preview</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>PVC Card Preview
+        <h2> Customize Your Own Card!</h2>
+    </h1>
+    <select id="materialSelector">
+        <option value="matte">Matte</option>
+        <option value="laser">Laser</option>
+    </select>
+    <input type="file" id="imageLoader" name="imageLoader" accept="image/*">
+    <div id="card-preview">
+        <div id="resizable-box">
+            <img id="user-image" src="" alt="User uploaded image">
+            <div class="resizer top-left"></div>
+            <div class="resizer top-right"></div>
+            <div class="resizer bottom-left"></div>
+            <div class="resizer bottom-right"></div>
+            <div class="resizer top"></div>
+            <div class="resizer bottom"></div>
+            <div class="resizer left"></div>
+            <div class="resizer right"></div>
+        </div>
+        <div id="material-overlay"></div>
+    </div>
+    <button id="submitBtn">Submit</button>
+    <div id="output"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

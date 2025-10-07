@@ -1,0 +1,118 @@
+#card-preview {
+    width: 856px;
+    height: 540px;
+    border: 1px solid black;
+    position: relative;
+    overflow: hidden; /* This is crucial to crop the image */
+    background-color: #f0f0f0; /* A light background for when no image is shown */
+    background-size: 100% 100%; /* Changed to 100% 100% to fill completely */
+    background-position: center;
+    border-radius: 3.18mm;
+}
+
+#resizable-box {
+    position: absolute;
+    border: 2px solid black;
+    overflow: hidden;
+    cursor: grab;
+    display: none; /* Hidden by default until user image is loaded */
+}
+
+#user-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: fill; /* Changed back to fill */
+}
+
+.resizer {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border: 1px solid black;
+    z-index: 10; /* Ensure resizers are on top */
+}
+
+.resizer.top-left {
+    top: -5px;
+    left: -5px;
+    cursor: nwse-resize;
+}
+.resizer.top-right {
+    top: -5px;
+    right: -5px;
+    cursor: nesw-resize;
+}
+.resizer.bottom-left {
+    bottom: -5px;
+    left: -5px;
+    cursor: nesw-resize;
+}
+.resizer.bottom-right {
+    bottom: -5px;
+    right: -5px;
+    cursor: nwse-resize;
+}
+.resizer.top {
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
+    width: 50px;
+}
+.resizer.bottom {
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: ns-resize;
+    width: 50px;
+}
+.resizer.left {
+    left: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    height: 50px;
+}
+.resizer.right {
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: ew-resize;
+    height: 50px;
+}
+
+#material-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Make sure it doesn't interfere with mouse events */
+    background: none; /* Reset background by default */
+    z-index: 5; /* Ensure overlay is above the image but below resizers */
+}
+
+/* --- CSS Effects for USER-UPLOADED images --- */
+
+/* Effect for Matte: a subtle darkening and desaturation effect */
+#material-overlay.user-image-matte-effect {
+    background-color: rgba(0, 0, 0, 0.15);
+    mix-blend-mode: multiply;
+}
+
+/* Effect for Laser: a colorful, iridescent overlay that is clearly not a plain image */
+#material-overlay.user-image-laser-effect {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 0, 255, 0.25) 0%,
+        rgba(0, 255, 255, 0.25) 50%,
+        rgba(255, 255, 0, 0.25) 100%
+    );
+    mix-blend-mode: overlay; /* 'overlay' or 'screen' work well for this effect */
+}
+
+.controls {
+    margin-top: 10px;
+}

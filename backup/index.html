@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="title">PVC Card Design Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 工作流程引导覆盖层 -->
+        <div class="workflow-overlay hidden" id="workflowOverlay">
+            <div class="workflow-modal">
+                <div class="workflow-header">
+                    <h3 data-translate="workflow-title">Quick Start Guide</h3>
+                    <div class="workflow-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">1/4</span>
+                    </div>
+                </div>
+                <div class="workflow-content">
+                    <div class="workflow-step" id="workflowStep">
+                        <h4 id="stepTitle" data-translate="step1-title">Choose Your Material</h4>
+                        <p id="stepDescription" data-translate="step1-desc">Select the material for your card. Different materials have different features and limitations.</p>
+                    </div>
+                </div>
+                <div class="workflow-actions">
+                    <button class="btn btn-secondary" id="skipWorkflow" data-translate="skip">Skip Guide</button>
+                    <button class="btn btn-primary" id="nextStep" data-translate="next">Next</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 引导高亮覆盖层 -->
+        <div class="guide-overlay" id="guideOverlay"></div>
+
+        <header class="header">
+            <h1 data-translate="title">PVC Card Design Platform</h1>
+            <div class="actions">
+                <div class="language-toggle">
+                    <button class="btn btn-toggle" id="langBtn">中文</button>
+                </div>
+                <button class="btn btn-primary" id="saveBtn" data-translate="save">Submit Design</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 1. 左侧操作栏 -->
+            <div class="action-toolbar">
+                <div class="toolbar-section">
+                    <button class="action-btn" id="undoBtn" title="Undo" disabled>
+                        <span class="icon">↶</span>
+                    </button>
+                    <button class="action-btn" id="redoBtn" title="Redo" disabled>
+                        <span class="icon">↷</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- 2. 预览主栏 -->
+            <div class="preview-area">
+                <!-- Front/Back 切换按钮 -->
+                <div class="card-side-toggle">
+                    <button class="toggle-btn active" data-side="front" data-translate="front">Front</button>
+                    <button class="toggle-btn" data-side="back" data-translate="back">Back</button>
+                </div>
+                
+                <!-- QR码状态横幅 -->
+                <div class="qr-status-banner" id="qrStatusBanner" style="display: none;">
+                    <div class="banner-content">
+                        <span class="banner-icon">⚠️</span>
+                        <span class="banner-text" data-translate="qr-missing-warning">QR code not added yet</span>
+                        <button class="banner-action-btn" id="bannerAddQRBtn">
+                            <span data-translate="add-now">Add Now</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-container">
+                    <div class="card front-side active" id="cardFront">
+                        <!-- 材料效果层 -->
+                        <canvas class="material-effect-canvas" id="frontMaterialCanvas"></canvas>
+                        <div class="card-content" id="frontContent">
+                            <div class="drop-zone">
+                                <p data-translate="drop-zone-text1">Drag or click to upload image</p>
+                                <p data-translate="drop-zone-text2">Or use the tools on the right to add elements</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card back-side" id="cardBack">
+                        <!-- 材料效果层 -->
+                        <canvas class="material-effect-canvas" id="backMaterialCanvas"></canvas>
+                        <div class="card-content" id="backContent">
+                            <div class="drop-zone">
+                                <p data-translate="drop-zone-text1">Drag or click to upload image</p>
+                                <p data-translate="drop-zone-text2">Or use the tools on the right to add elements</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 警告信息 -->
+                <div class="warnings-container">
+                    <div class="material-warning" id="materialWarning" style="display: none;">
+                        <div class="warning-content">
+                            <span class="warning-icon">⚠️</span>
+                            <span class="warning-text" data-translate="metal-warning">Metal card back is plastic material</span>
+                        </div>
+                    </div>
+                    <div class="single-color-warning" id="singleColorWarning" style="display: none;">
+                        <div class="warning-content">
+                            <span class="warning-icon">ℹ️</span>
+                            <span class="warning-text" data-translate="single-color-warning">This material only supports monochrome engraving design</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 功能选择区 -->
+            <div class="feature-selector">
+                <div class="feature-tabs">
+                    <button class="feature-tab active" data-feature="material">
+                        <span class="tab-icon">🏗️</span>
+                        <span data-translate="material">Material</span>
+                    </button>
+                    <button class="feature-tab" data-feature="template">
+                        <span class="tab-icon">📄</span>
+                        <span data-translate="template">Template</span>
+                    </button>
+                    <button class="feature-tab" data-feature="image">
+                        <span class="tab-icon">🖼️</span>
+                        <span data-translate="image">Image</span>
+                    </button>
+                    <button class="feature-tab qr-tab" data-feature="qrcode" id="qrTab" style="display: none;">
+                        <span class="tab-icon">📱</span>
+                        <span data-translate="qr-code">QR Code</span>
+                    </button>
+                    <button class="feature-tab" data-feature="text">
+                        <span class="tab-icon">📝</span>
+                        <span data-translate="text">Text</span>
+                    </button>
+                    <button class="feature-tab" data-feature="shape">
+                        <span class="tab-icon">⬜</span>
+                        <span data-translate="shape">Shape</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. 属性面板 -->
+            <div class="properties-panel">
+                <!-- 材质属性 -->
+                <div class="property-content active" id="materialProperties">
+                    <h3 data-translate="material-selection">Material Selection</h3>
+                    <div class="material-grid">
+                        <div class="material-option" data-material="pvc">
+                            <div class="material-preview pvc"></div>
+                            <span data-translate="material-pvc">Standard PVC</span>
+                        </div>
+                        <div class="material-option" data-material="wood">
+                            <div class="material-preview wood"></div>
+                            <span data-translate="material-wood">Wood Material</span>
+                        </div>
+                        <div class="material-option" data-material="metal">
+                            <div class="material-preview metal"></div>
+                            <span data-translate="material-metal">Metal Material</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模板属性 -->
+                <div class="property-content" id="templateProperties">
+                    <h3 data-translate="template-selection">Template Selection</h3>
+                    <div class="template-grid">
+                        <div class="template-item" data-template="blank">
+                            <div class="template-preview blank"></div>
+                            <span data-translate="template-blank">Blank Template</span>
+                        </div>
+                        <div class="template-item pvc-only" data-template="blue">
+                            <div class="template-preview blue"></div>
+                            <span data-translate="template-blue">Blue Semi-Custom</span>
+                        </div>
+                        <div class="template-item pvc-only" data-template="pink">
+                            <div class="template-preview pink"></div>
+                            <span data-translate="template-pink">Pink Semi-Custom</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图片属性 -->
+                <div class="property-content" id="imageProperties">
+                    <h3 data-translate="upload-image">Upload Image</h3>
+                    
+                    <!-- 上传按钮（无图片时显示） -->
+                    <div class="upload-section" id="uploadSection">
+                        <button class="upload-btn" id="uploadImageBtn">
+                            <span class="icon">📷</span>
+                            <span data-translate="upload-your-image">Upload Your Image</span>
+                        </button>
+                        
+                        <p class="upload-hint" data-translate="upload-hint">Drag & drop or click to browse</p>
+                    </div>
+                    
+                    <!-- 图片属性控制（有图片时显示） -->
+                    <div class="image-properties" id="imagePropertiesPanel" style="display: none;">
+                        <div class="property-section">
+                            <h4 data-translate="dimensions">Dimensions</h4>
+                            <div class="dimension-controls">
+                                <div class="control-group">
+                                    <label data-translate="width">Width:</label>
+                                    <input type="number" id="imageWidth" min="10" max="500" value="200">
+                                    <span>px</span>
+                                </div>
+                                <div class="control-group">
+                                    <label data-translate="height">Height:</label>
+                                    <input type="number" id="imageHeight" min="10" max="316" value="150">
+                                    <span>px</span>
+                                </div>
+                                <div class="control-group">
+                                    <label>
+                                        <input type="checkbox" id="maintainAspectRatio" checked>
+                                        <span data-translate="lock-aspect">Lock Aspect Ratio</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="position">Position</h4>
+                            <div class="position-controls">
+                                <div class="control-group">
+                                    <label data-translate="x-position">X:</label>
+                                    <input type="number" id="imageX" min="0" max="500" value="0">
+                                    <span>px</span>
+                                </div>
+                                <div class="control-group">
+                                    <label data-translate="y-position">Y:</label>
+                                    <input type="number" id="imageY" min="0" max="316" value="0">
+                                    <span>px</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="appearance">Appearance</h4>
+                            <div class="control-group">
+                                <label data-translate="opacity">Opacity:</label>
+                                <input type="range" id="imageOpacity" min="0" max="100" value="100">
+                                <span id="opacityValue">100%</span>
+                            </div>
+                            <div class="control-group">
+                                <label data-translate="rotation">Rotation:</label>
+                                <input type="range" id="imageRotation" min="0" max="360" value="0">
+                                <span id="rotationValue">0°</span>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <button class="delete-btn" id="deleteImageBtn" data-translate="delete-image">Delete Image</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR码属性 -->
+                <div class="property-content" id="qrcodeProperties">
+                    <h3 data-translate="qr-code-management">QR Code Management</h3>
+                    
+                    <!-- QR码添加按钮（未添加时显示） -->
+                    <div class="qr-add-section" id="qrAddSection">
+                        <button class="qr-add-btn" id="mainAddQRBtn">
+                            <span class="icon">📱</span>
+                            <span data-translate="add-qr-code">Add QR Code</span>
+                        </button>
+                        
+                        <div class="qr-info">
+                            <div class="qr-required-notice">
+                                <span class="notice-icon">ℹ️</span>
+                                <p data-translate="qr-main-notice">QR code is required for PVC full customization cards. We will generate an exclusive QR code for your card.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- QR码状态显示（已添加时显示） -->
+                    <div class="qr-status-section" id="qrStatusSection" style="display: none;">
+                        <div class="qr-status-info">
+                            <span class="status-icon">✅</span>
+                            <span data-translate="qr-added-status">QR code has been added to your card</span>
+                        </div>
+                        
+                        <div class="qr-controls">
+                            <button class="qr-action-btn" id="removeQRBtn">
+                                <span class="icon">🗑️</span>
+                                <span data-translate="remove-qr">Remove QR Code</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文字属性 -->
+                <div class="property-content" id="textProperties">
+                    <h3 data-translate="add-text">Add Text</h3>
+                    
+                    <!-- 添加文字按钮（无选中文字时显示） -->
+                    <div class="add-text-section" id="addTextSection">
+                        <button class="add-btn" id="addTextBtn">
+                            <span class="icon">T</span>
+                            <span data-translate="add-text-element">Add Text Element</span>
+                        </button>
+                        <p class="add-hint" data-translate="text-hint">Click to add a new text element</p>
+                    </div>
+                    
+                    <!-- 文字属性控制（有选中文字时显示） -->
+                    <div class="text-properties" id="textPropertiesPanel" style="display: none;">
+                        <div class="property-section">
+                            <h4 data-translate="content">Content</h4>
+                            <div class="control-group">
+                                <label data-translate="text-content">Text:</label>
+                                <textarea id="textContentInput" placeholder="Enter your text here..." rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="typography">Typography</h4>
+                            <div class="control-group">
+                                <label data-translate="font-family">Font:</label>
+                                <select id="fontFamilySelect">
+                                    <option value="Arial">Arial</option>
+                                    <option value="Microsoft YaHei">Microsoft YaHei</option>
+                                    <option value="SimSun">SimSun</option>
+                                    <option value="KaiTi">KaiTi</option>
+                                    <option value="Helvetica">Helvetica</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label data-translate="font-size">Font Size:</label>
+                                <input type="range" id="textSize" min="12" max="72" value="16">
+                                <span id="textSizeValue">16px</span>
+                            </div>
+                            <div class="control-group">
+                                <label data-translate="color">Color:</label>
+                                <input type="color" id="textColor" value="#000000">
+                            </div>
+                            <div class="control-group">
+                                <label data-translate="alignment">Alignment:</label>
+                                <div class="text-align-buttons">
+                                    <button class="align-btn" data-align="left" title="Left">◀</button>
+                                    <button class="align-btn" data-align="center" title="Center">▬</button>
+                                    <button class="align-btn" data-align="right" title="Right">▶</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="position">Position</h4>
+                            <div class="position-controls">
+                                <div class="control-group">
+                                    <label data-translate="x-position">X:</label>
+                                    <input type="number" id="textX" min="0" max="500" value="0">
+                                    <span>px</span>
+                                </div>
+                                <div class="control-group">
+                                    <label data-translate="y-position">Y:</label>
+                                    <input type="number" id="textY" min="0" max="316" value="0">
+                                    <span>px</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="style">Style</h4>
+                            <div class="text-style-buttons">
+                                <button class="style-btn" id="boldBtn" title="Bold"><strong>B</strong></button>
+                                <button class="style-btn" id="italicBtn" title="Italic"><em>I</em></button>
+                                <button class="style-btn" id="underlineBtn" title="Underline"><u>U</u></button>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <button class="delete-btn" id="deleteTextBtn" data-translate="delete-text">Delete Text</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 形状属性 -->
+                <div class="property-content" id="shapeProperties">
+                    <h3 data-translate="add-shape">Add Shape</h3>
+                    
+                    <!-- 添加形状按钮（无选中形状时显示） -->
+                    <div class="add-shape-section" id="addShapeSection">
+                        <div class="shape-grid">
+                            <button class="shape-btn" data-shape="rectangle">
+                                <div class="shape-icon rectangle"></div>
+                                <span data-translate="rectangle">Rectangle</span>
+                            </button>
+                            <button class="shape-btn" data-shape="circle">
+                                <div class="shape-icon circle"></div>
+                                <span data-translate="circle">Circle</span>
+                            </button>
+                        </div>
+                        <p class="add-hint" data-translate="shape-hint">Click to add a shape to your design</p>
+                    </div>
+                    
+                    <!-- 形状属性控制（有选中形状时显示） -->
+                    <div class="shape-properties" id="shapePropertiesPanel" style="display: none;">
+                        <div class="property-section">
+                            <h4 data-translate="dimensions">Dimensions</h4>
+                            <div class="dimension-controls">
+                                <div class="control-group">
+                                    <label data-translate="width">Width:</label>
+                                    <input type="number" id="shapeWidth" min="10" max="500" value="100">
+                                    <span>px</span>
+                                </div>
+                                <div class="control-group">
+                                    <label data-translate="height">Height:</label>
+                                    <input type="number" id="shapeHeight" min="10" max="316" value="100">
+                                    <span>px</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="position">Position</h4>
+                            <div class="position-controls">
+                                <div class="control-group">
+                                    <label data-translate="x-position">X:</label>
+                                    <input type="number" id="shapeX" min="0" max="500" value="0">
+                                    <span>px</span>
+                                </div>
+                                <div class="control-group">
+                                    <label data-translate="y-position">Y:</label>
+                                    <input type="number" id="shapeY" min="0" max="316" value="0">
+                                    <span>px</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <h4 data-translate="appearance">Appearance</h4>
+                            <div class="control-group">
+                                <label>
+                                    <input type="checkbox" id="enableFill" checked>
+                                    <span data-translate="enable-fill">Enable Fill</span>
+                                </label>
+                                <input type="color" id="shapeFillColor" value="#3498db">
+                            </div>
+                            <div class="control-group">
+                                <label>
+                                    <input type="checkbox" id="enableStroke">
+                                    <span data-translate="enable-stroke">Enable Stroke</span>
+                                </label>
+                                <input type="color" id="shapeStrokeColor" value="#2c3e50">
+                            </div>
+                            <div class="control-group">
+                                <label data-translate="stroke-width">Stroke Width:</label>
+                                <input type="range" id="shapeStrokeWidth" min="0" max="20" value="2">
+                                <span id="strokeWidthValue">2px</span>
+                            </div>
+                            <div class="control-group">
+                                <label data-translate="opacity">Opacity:</label>
+                                <input type="range" id="shapeOpacity" min="0" max="100" value="100">
+                                <span id="shapeOpacityValue">100%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="property-section">
+                            <button class="delete-btn" id="deleteShapeBtn" data-translate="delete-shape">Delete Shape</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 文字编辑模态框 -->
+    <div class="modal" id="textModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 data-translate="text-edit">Text Edit</h3>
+            <div class="text-controls">
+                <div class="control-group">
+                    <label for="textInput" data-translate="text-content">Text Content:</label>
+                    <textarea id="textInput" data-translate-placeholder="text-placeholder" placeholder="Enter text content..."></textarea>
+                </div>
+                <div class="control-group">
+                    <label for="fontFamily" data-translate="font-family">Font:</label>
+                    <select id="fontFamily">
+                        <option value="Arial">Arial</option>
+                        <option value="Microsoft YaHei">Microsoft YaHei</option>
+                        <option value="SimSun">SimSun</option>
+                        <option value="KaiTi">KaiTi</option>
+                        <option value="Helvetica">Helvetica</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="fontSize" data-translate="font-size">Font Size:</label>
+                    <input type="range" id="fontSize" min="12" max="72" value="16">
+                    <span id="fontSizeValue">16px</span>
+                </div>
+                <div class="control-group">
+                    <label for="textColor" data-translate="color">Color:</label>
+                    <input type="color" id="textColor" value="#000000">
+                </div>
+                <div class="control-group">
+                    <label data-translate="style">Style:</label>
+                    <div class="text-style-buttons">
+                        <button class="style-btn" id="boldBtn">B</button>
+                        <button class="style-btn" id="italicBtn">I</button>
+                        <button class="style-btn" id="underlineBtn">U</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label data-translate="alignment">Alignment:</label>
+                    <div class="text-align-buttons">
+                        <button class="align-btn" data-align="left">←</button>
+                        <button class="align-btn" data-align="center">↔</button>
+                        <button class="align-btn" data-align="right">→</button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="confirmText" data-translate="confirm">Confirm</button>
+                    <button class="btn btn-secondary" id="cancelText" data-translate="cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 形状选择悬浮窗 -->
+    <div class="shape-popup" id="shapePopup">
+        <div class="shape-popup-content">
+            <h4 data-translate="select-shape">Select Shape</h4>
+            <div class="shape-selector">
+                <button class="shape-option" data-shape="rectangle">
+                    <div class="shape-icon rectangle"></div>
+                    <span data-translate="rectangle">Rectangle</span>
+                </button>
+                <button class="shape-option" data-shape="circle">
+                    <div class="shape-icon circle"></div>
+                    <span data-translate="circle">Circle</span>
+                </button>
+            </div>
+            
+            <div class="shape-config">
+                <div class="config-section">
+                    <label data-translate="fill-settings">Fill Settings</label>
+                    <div class="config-group">
+                        <input type="checkbox" id="popupEnableFill" checked>
+                        <label for="popupEnableFill" data-translate="enable-fill">Enable Fill</label>
+                        <input type="color" id="popupFillColor" value="#3498db">
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <label data-translate="stroke-settings">Stroke Settings</label>
+                    <div class="config-group">
+                        <input type="checkbox" id="popupEnableStroke">
+                        <label for="popupEnableStroke" data-translate="enable-stroke">Enable Stroke</label>
+                        <input type="color" id="popupStrokeColor" value="#2c3e50">
+                    </div>
+                    <div class="config-group">
+                        <label for="popupStrokeWidth" data-translate="thickness">Thickness:</label>
+                        <input type="range" id="popupStrokeWidth" min="1" max="20" value="2">
+                        <span id="popupStrokeWidthValue">2px</span>
+                    </div>
+                    <div class="config-group">
+                        <label for="popupStrokeStyle" data-translate="stroke-style">Style:</label>
+                        <select id="popupStrokeStyle">
+                            <option value="solid">Solid</option>
+                            <option value="dashed">Dashed</option>
+                            <option value="dotted">Dotted</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="shape-preview-area">
+                <div class="preview-shape" id="previewShape"></div>
+            </div>
+            
+            <div class="popup-actions">
+                <button class="btn btn-primary" id="confirmShape" data-translate="confirm-add">Confirm Add</button>
+                <button class="btn btn-secondary" id="cancelShape" data-translate="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户信息收集模态框 -->
+    <div class="modal" id="userInfoModal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="userInfoClose">&times;</span>
+            <h3 data-translate="user-info-title">Submit Your Design</h3>
+            <p data-translate="user-info-desc">Please provide your information to receive your design:</p>
+            
+            <form id="userInfoForm">
+                <div class="form-group">
+                    <label for="userName" data-translate="name-label">Name *</label>
+                    <input type="text" id="userName" name="name" required placeholder="Enter your name">
+                    <small class="error-text" id="nameError" style="display: none;"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userEmail" data-translate="email-label">Email *</label>
+                    <input type="email" id="userEmail" name="email" required placeholder="Enter your email">
+                    <small class="error-text" id="emailError" style="display: none;"></small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userPhone" data-translate="phone-label">Phone (Optional)</label>
+                    <input type="tel" id="userPhone" name="phone" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label for="userNotes" data-translate="notes-label">Special Requirements or Notes (Optional)</label>
+                    <textarea id="userNotes" name="notes" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary" data-translate="submit-design">Submit Design</button>
+                    <button type="button" class="btn btn-secondary" id="cancelSubmit" data-translate="cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+
+    <!-- 添加html2canvas库用于高质量图片捕获 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
