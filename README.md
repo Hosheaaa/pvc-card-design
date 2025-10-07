@@ -110,10 +110,6 @@ pm2 restart pvc-design-server
 - Let's Encrypt SSL/TLS
 - GoDaddy DNS
 
-## Related Projects
-
-This project was separated from the Shopify theme development repository. The Shopify theme files remain in `../shopify_dev/`.
-
 ## License
 
 Proprietary - SoonAI Singapore
